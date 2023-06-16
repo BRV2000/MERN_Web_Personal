@@ -10,6 +10,7 @@ function asureAuth(req, res, next){
     try {
         const payload = jwt.decoded(token);
         console.log(payload);
+        next();
     } catch (error) {
          return res.status(400).send({msg: " Token invalido"});
 
