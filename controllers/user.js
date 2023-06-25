@@ -44,15 +44,12 @@ async function createUser(req, res) {
     }
     
     
-    user.save((error, userStored) => {
-        
-        if (error) {
-            res.status(400).send({msg: "Error al crear el usuario"});
-        } else {
-            res.status(201).send(userStored);
-        }
-
-    });
+  try {
+    const response = await user.save();
+    res.status(201).send(response);
+  } catch (error) {
+    res.status().send({msg: "Error al crear el Usuario"});
+  }
     
 }
 
