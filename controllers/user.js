@@ -1,12 +1,12 @@
 const bcrypt = require("bcryptjs");
-const user = require("../models/user");
+const User = require("../models/user");
 
 
 async function getMe(req,res){
    
    const {user_id} = req.user;
    
-   const response = await user.findById(user_id);
+   const response = await User.findById(user_id);
 
    if (!response) {
     res.status(400).send({msg: "No se ha encontrado usuario"});
@@ -22,9 +22,9 @@ async function getUsers(req,res){
     let response = null;
 
     if (active === undefined) {
-        response = await user.find();
+        response = await User.find();
     } else {
-        response = await user.find({active});
+        response = await User.find({active});
     }
     
     res.status(200).send(response);
@@ -38,9 +38,22 @@ async function createUser(req, res) {
     const hasPassword = bcrypt.hashSync(password, salt);
     user.password = hasPassword;
 
-    console.log(user);
+    if (req.files.avatar) {
+        //to do
+        console.log("procesar avatar");
+    }
+    
+    
+    user.save((error, userStored) => {
+        
+        if (error) {
+            res.status(400).send({msg: "Error al crear el usuario"});
+        } else {
+            res.status(201).send(userStored);
+        }
 
-    res.status(200).send({msg: "OK"});
+    });
+    
 }
 
 module.exports = {
