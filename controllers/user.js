@@ -1,6 +1,6 @@
 const bcrypt = require("bcryptjs");
 const User = require("../models/user");
-
+const image = require("../utils/image");
 
 async function getMe(req,res){
    
@@ -39,22 +39,36 @@ async function createUser(req, res) {
     user.password = hasPassword;
 
     if (req.files.avatar) {
-        //to do
-        console.log("procesar avatar");
+       const imageName = image.getfileName(req.files.avatar);
+       user.avatar = imageName;
     }
     
-    
-  try {
-    const response = await user.save();
-    res.status(201).send(response);
-  } catch (error) {
-    res.status().send({msg: "Error al crear el Usuario"});
-  }
-    
+    try {
+        const response = await user.save();
+        res.status(201).send(response);
+      } catch (error) {
+       
+        res.status(400).send({msg: "Error al crear el Usuario"});
+      }
+}
+
+async function updateUser(req, res) {
+    const { id } = req.params;
+    const userData = req.body;
+
+    User.findByIdAndUpdate({_id: id}, userData, (error) =>{
+        if (error) {
+            res.status(400).send({msg:"Error al actualizar el usuario"});
+        }else{
+            res.status(200).send({msg:"Actualizacion correcta"});
+        }
+    })
+   
 }
 
 module.exports = {
     getMe,
     getUsers,
     createUser,
+    updateUser,
 };
