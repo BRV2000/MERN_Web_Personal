@@ -56,14 +56,39 @@ async function updateUser(req, res) {
     const { id } = req.params;
     const userData = req.body;
 
-    User.findByIdAndUpdate({_id: id}, userData, (error) =>{
-        if (error) {
-            res.status(400).send({msg:"Error al actualizar el usuario"});
-        }else{
-            res.status(200).send({msg:"Actualizacion correcta"});
-        }
-    })
+    if (userData.password) {
+        const salt = bcrypt.genSaltSync(10);
+        const hashPassword = bcrypt.hashSync(userData.password,salt);
+        userData.password = hashPassword;
+
+    } else {
+        delete userData.password;
+    }
+
+    if (req.files.avatar) {
+        const imageName = image.getfileName(req.files.avatar);
+        userData.avatar = imageName;
+    }
+
+    try {
+        await User.findByIdAndUpdate(id,userData);
+        res.status(200).send({msg:"Actualizacion correcta"});
+    } catch (error) {
+        res.status(400).send({msg:"Error al actualizar el usuario"});
+    }
    
+}
+
+async function deleteUser(req,res){
+    const {id} = req.params;
+
+    try {
+        await User.findByIdAndDelete(id);
+        req.status(200).send({msg: "Usuario Eliminado"});
+    } catch (error) {
+        res.status(400).send({msg: "Error al eliminar Usuario"});
+    }
+
 }
 
 module.exports = {
@@ -71,4 +96,5 @@ module.exports = {
     getUsers,
     createUser,
     updateUser,
+    deleteUser,
 };
