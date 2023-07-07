@@ -84,7 +84,7 @@ async function deleteUser(req,res){
 
     try {
         await User.findByIdAndDelete(id);
-        req.status(200).send({msg: "Usuario Eliminado"});
+        res.status(200).send({msg: "Usuario Eliminado"});
     } catch (error) {
         res.status(400).send({msg: "Error al eliminar Usuario"});
     }

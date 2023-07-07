@@ -16,15 +16,14 @@ async function register (req, res){
         email: email.toLowerCase(),
         password,
         role: "user",
-        active: false
+        active: false,
     });
     
    const salt = bcrypt.genSaltSync(10);
    const hashPassword = bcrypt.hashSync(password,salt);
    user.password = hashPassword;
   
-   //console.log(user);
-   //res.status(200).send({msg: "TODO OK"});
+   
 
   try{
     await user.save();
